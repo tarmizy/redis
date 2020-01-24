@@ -3,7 +3,8 @@ FROM alpine:3.10
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN addgroup -S -g 1000 redis && adduser -S -G redis -u 999 redis
 # alpine already has a gid 999, so we'll use the next id
-
+ENV TZ=Asia/Jakarta
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apk add --no-cache \
 # grab su-exec for easy step-down from root
 		'su-exec>=0.2' \
@@ -69,7 +70,7 @@ RUN set -eux; \
 	redis-server --version
 
 RUN mkdir /data && chown redis:redis /data
-VOLUME /data
+VOLUME ./data
 WORKDIR /data
 
 COPY docker-entrypoint.sh /usr/local/bin/
